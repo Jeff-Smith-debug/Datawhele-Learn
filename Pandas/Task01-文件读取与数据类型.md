@@ -1,4 +1,4 @@
-@[TOC](Pandas入门)
+
 **这个主要是对pandas官方文档的学习与做练习**
 使用的IDE是jupyter，基于web的交互式编程
 # 1 理论部分
