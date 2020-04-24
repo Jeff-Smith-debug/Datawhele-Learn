@@ -1,4 +1,4 @@
-  @[TOC](task02-索引)
+@[TOC](task02-索引)
 问题记录：
 1、什么是联合索引？
 2、这个：： 号是什么意思？
@@ -273,16 +273,18 @@ df_s.loc[idx[:'B',(df_s.iloc[:,0]>0.6),(df_s.iloc[:,0]>0.6)],:] #这个就不是
 ```
 ## 2.4 索引层的交换
 ### 2.4.1 swaplevel(两层交换)
+```
 df_using_mul.head()
 df_using_mul.swaplevel(i=1,j=0,axis=0).sort_index().head()
-
+```
 ### 2.4.2 reorder_levels方法（多层交换）
+```python
 df_muls = df.set_index(['School','Class','Address'])
 df_muls.head()
 df_muls.reorder_levels([2,0,1],axis=0).sort_index().head()
 #如果索引有name，可以直接使用name
 df_muls.reorder_levels(['Address','School','Class'],axis=0).sort_index().head()
-
+```
 # 3 索引设定
 ## 3.1 index_col 参数
 index_col是read_csv中的一个参数，而不是某一个方法：
@@ -291,7 +293,7 @@ pd.read_csv('data/table.csv',index_col=['Address','School']).head()
 ```
 ## 3.2 reindex和reindex_like
 reindex是指重新索引，它的重要特性在于索引对齐，很多时候用于重新排序
-```
+```python
 df.head()
 df.reindex(index=[1101,1203,1206,2402])
 df.reindex(columns=['Height','Gender','Average']).head()
@@ -314,7 +316,7 @@ df_temp = pd.DataFrame({'Weight':range(5),
                         'ID':[1101,1104,1103,1106,1102]}).set_index('ID').sort_index()
 df_temp.reindex_like(df[0:5][['Weight','Height']],method='bfill')
 # 可以自行检验这里的1105的值是否是由bfill规则填充
-
+```
 ## 3.3 set_index和reset_index
 ### 3.3.1 set_index方法
 先介绍set_index：从字面意思看，就是将某些列作为索引
@@ -327,9 +329,9 @@ df.set_index('Class',append=True).head()
 df.set_index(pd.Series(range(df.shape[0]))).head()
 # 可以直接添加多级索引：
 df.set_index([pd.Series(range(df.shape[0])),pd.Series(np.ones(df.shape[0]))]).head()
-
+```
 ### 3.3.2 介绍reset_index方法
-它的主要功能是将索引重置；
+它的主要功能是将索引重置:
 ```
 # 默认状态直接恢复到自然数索引：
 df.reset_index().head()
@@ -346,13 +348,14 @@ df_temp1.head()
 
 df_temp1.columns #看到的确插入了level2
 df_temp1.index #最内层索引被移出
-
+```
 ## 3.4 rename_axis和rename
-rename_axis是针对多级索引的方法，作用是修改某一层的索引名，而不是索引标签;
+```
+# rename_axis是针对多级索引的方法，作用是修改某一层的索引名，而不是索引标签;
 df_temp.rename_axis(index={'Lower':'LowerLower'},columns={'Big':'BigBig'})
-rename方法用于修改列或者行索引标签，而不是索引名：
+# rename方法用于修改列或者行索引标签，而不是索引名：
 df_temp.rename(index={'A':'T'},columns={'e':'changed_e'}).head()
-
+```
 # 4 常用索引型函数
 ## 4.1 where函数
 ```
@@ -364,24 +367,24 @@ df.where(df['Gender']=='M').head()
 df.where(df['Gender']=='M').dropna().head()
 # 第一个参数为布尔条件，第二个参数为填充值：
 df.where(df['Gender']=='M',np.random.rand(df.shape[0],df.shape[1])).head()
-
 ```
 ## 4.2 mask 函数
-mask函数与where功能上相反，其余完全一致，即对条件为True的单元进行填充
+```
+# mask函数与where功能上相反，其余完全一致，即对条件为True的单元进行填充
 df.mask(df['Gender']=='M').dropna().head()
 df.mask(df['Gender']=='M',np.random.rand(df.shape[0],df.shape[1])).head()
-
+```
 ## 4.3 query函数
 ```
 df.head()
 # query函数中的布尔表达式中，下面的符号都是合法的：行列索引名、字符串、and/not/or/&/|/
 #  ~/not in/in/==/!=、四则运算符
 df.query('(Address in ["street_6","street_7"])&(Weight>(70+10))&(ID in [1303,2304,2402])')
-
+```
 # 5 重复元素处理
 ## 5.1 duplicated方法
 该方法返回了是否重复的布尔列表
-```
+```python
 df.duplicated('Class').head()
 # 可选参数keep默认为first，即首次出现设为不重复，若为last，则最后一次设为不重复，若为
 # False，则所有重复项为True
@@ -391,16 +394,17 @@ df.duplicated('Class',keep=False).head()
 ```
 ## 5.2 drop_duplicates方法
 从名字上看出为剔除重复项，这在后面章节中的分组操作中可能是有用的，例如需要保留每组的第一个值
-```
+```python
 df.drop_duplicates('Class')
 参数与duplicate函数类似：
 df.drop_duplicates('Class',keep='last')
 在传入多列时等价于将多列共同视作一个多级索引，比较重复项:
 df.drop_duplicates(['School','Class'])
 ```
+
 # 6 抽样函数
 这里的抽样函数指的就是sample函数
-```
+```python
 #（a）n为样本量
 df.sample(n=5)
 # (b）frac为抽样比
@@ -415,3 +419,8 @@ df.sample(n=3,weights=np.random.rand(df.shape[0])).head()
 #以某一列为权重，这在抽样理论中很常见
 #抽到的概率与Math数值成正比
 df.sample(n=3,weights=df['Math']).head()
+```
+
+
+
+
