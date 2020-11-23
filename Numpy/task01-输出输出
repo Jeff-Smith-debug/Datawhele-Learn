@@ -1,0 +1,19 @@
+@[TOC](输入输出)
+# 1 Numpy二进制文件
+## 1.1 Numpy二进制文件
+1. 保存和读取函数
+
+save(),savez()和load()函数以Numpy专用的二进制类型(npy,npz)保存和读取数据。
+这三个函数会自动处理ndim,shape等信息，使用他们读写数组非常方便。
+但save（）输出文件比较难与其他语言编写程序兼容
+2. 格式介绍
+
+npy格式：以二进制的方式存储文件，在二进制文件第一行以文本形式保存了数据的元信息。(ndim,dtype,shape等)，可以用二进制的工具查看内容
+
+npz格式：以压缩打包的方式存储文件，可以用压缩软件解压
+3. 使用
+
+numpy.save(file,arr,allow_pickle=True,fix_imports=True) Save an array to a binary file in Numpy .npy format.
+
+numpy.load(file,map_mode=None,allow_pickle=False,file_importance,encoding='ASCII') Load arrays or picked objects from .npy .npz or pickld files.
+
