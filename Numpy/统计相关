@@ -1,0 +1,140 @@
+@[TOC](Numpy--统计相关)
+* 线性代数和概率论对于应用是真的很重要；基本知识一定还是要看一下；
+* 先看书，然后再看相关视屏；因为书是精炼过的；PPT>书本>视频
+* 好多插件真的是很有用。
+# 1 Numpy--统计相关
+## 1.1 计算最小值
+* numpy.amin(a,[axis=None,out=None,keepdims=np._NoValue,initial=np.NpValue,where=np._NoValue])
+Return the minimum of an array or minimum along an axis.
+```py
+import numpy as np
+
+x=np.array([11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,25],[26,27,28,29,30],[31,32,33,34,35])
+y=np.amin(x)
+
+```
+## 1.2 计算最大值
+# numpy.amax(a[, axis=None, out=None, keepdims=np._NoValue, initial=np._NoValue, where=np._NoValue])
+# Return the maximum of an array or maximum along an axis.
+x = np.array([[11, 12, 13, 14, 15],
+              [16, 17, 18, 19, 20],
+              [21, 22, 23, 24, 25],
+              [26, 27, 28, 29, 30],
+              [31, 32, 33, 34, 35]])
+y=np.amax(x)
+print(y)
+
+y=np.amax(x,axis=0)
+print(y)
+
+y=np.amax(x,axis=1)
+print(y)
+
+## 1.3计算极差
+# numpy.ptp(a,axis=None,keepdims=np.NoValue) 
+# 沿轴的值范围（最大值-最小值）。函数的名称来自“ peak to peak”的缩写
+import numpy as np
+np.random.seed(20200623)
+x=np.random.randint(0,20,size=[4,5])
+print(x)
+
+# 0表示行，1表示列
+print(np.ptp(x))
+print(np.ptp(x,axis=0))
+print(np.ptp(x,axis=1))
+
+## 1.4 计算分位数
+# numpy.percentitle(a,q,axis=None,out=None,overwrite_input=False,interpolation='linear',keepdims=False)
+# 计算沿指定轴的数据的第q个百分位数。返回数组元素的第q个百分点。
+import numpy as np
+
+np.random.seed(20200623)
+x=np.random.randint(0,20,size=[4,5])
+print(x)
+
+print(np.percentile(x,[25,50])) #[ 2. 10.]
+
+print(np.percentile(x,[25,50],axis=0)) 
+# [[10.75  1.75  0.75 10.75  9.5 ]
+# [13.5   2.    5.   14.5  13.  ]]
+
+print(np.percentile(x,[25,50],axis=1))
+# [[ 1. 10.  8.  2.]
+# [ 2. 11.  9. 15.]]
+
+# 2 均值与方差
+## 2.1 计算中位数
+# numpy.median(a,axis=None,out=None,overwrite_input=False,keepdims=false) 
+# 计算沿指定轴的中位数。返回数组元素的中位数
+
+import numpy as np
+
+np.random.seed(20200623)
+x=np.random.randint(0,20,size=[4,5])
+print(x)
+
+print(np.percentile(x,50))
+print(np.median(x))
+
+print(np.percentile(x,50,axis=0))
+print(np,median(x,axis=0))
+
+print(np.percentile(x,50,axis=1))
+print(np.median(x,axis=1))
+
+## 计算平均值
+numpy.mean(a[, axis=None, dtype=None, out=None, keepdims=np._NoValue)])Compute the arithmetic mean along the specified axis.
+
+# 计算平均值（沿轴的元素的总和除以元素的数量）
+
+import numpy as np
+
+x = np.array([[11, 12, 13, 14, 15],
+              [16, 17, 18, 19, 20],
+              [21, 22, 23, 24, 25],
+              [26, 27, 28, 29, 30],
+              [31, 32, 33, 34, 35]])
+y = np.mean(x)
+print(y)  # 23.0
+
+y = np.mean(x, axis=0)
+print(y)  # [21. 22. 23. 24. 25.]
+
+y = np.mean(x, axis=1)
+print(y)  # [13. 18. 23. 28. 33.]
+
+## 计算加权平均值
+numpy.average(a[, axis=None, weights=None, returned=False])Compute the weighted average along the specified axis.
+mean和average都是计算均值的函数，在不指定权重的时候average和mean是一样的。指定权重后，average可以计算加权平均值。
+
+【例】计算加权平均值（将各数值乘以相应的权数，然后加总求和得到总体值，再除以总的单位数。）
+import numpy as np
+
+x = np.array([[11, 12, 13, 14, 15],
+              [16, 17, 18, 19, 20],
+              [21, 22, 23, 24, 25],
+              [26, 27, 28, 29, 30],
+              [31, 32, 33, 34, 35]])
+y = np.average(x)
+print(y)  # 23.0
+
+y = np.average(x, axis=0)
+print(y)  # [21. 22. 23. 24. 25.]
+
+y = np.average(x, axis=1)
+print(y)  # [13. 18. 23. 28. 33.]
+
+
+y = np.arange(1, 26).reshape([5, 5])
+print(y)
+# [[ 1  2  3  4  5]
+#  [ 6  7  8  9 10]
+#  [11 12 13 14 15]
+#  [16 17 18 19 20]
+#  [21 22 23 24 25]]
+
+z = np.average(x, weights=y)
+print(z)  # 27.0
+
+z = np.average(x, axis=0, weights=y)
+print(z)
