@@ -1,0 +1,319 @@
+
+
+@[TOC](Task04--线性代数相关)
+Numpy定义了matrix类型，使用该matrix类型创建的是矩阵对象，加减陈处缺省默认的是矩阵方式计算。
+用法和MATLAB基本一样。但是Numpy同时存在ndarray和matrix对象，因此用户很容易将两者弄混。
+Python原则：显示优于隐式，因此官方并不推荐在程序中使用 matrix。在这里，我们仍然用 ndarray 来介绍。
+# 1 Nmupy线性代数
+## 1.1 矩阵和向量积
+矩阵的定义，矩阵的加法，矩阵的数乘，矩阵的转置与二维数组完全一致，不再进行说明，但矩阵的乘法有不同的表示。
+* Numpy.dot(a,b,[out])计算两个矩阵的矩阵乘积，如果是一维数组则是他们的内积。
+```py
+# 计算两个一维数组
+import numpy as np
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2, 3, 4, 5, 6])
+# 若是两个一维数组，就是他们的内积和
+z = np.dot(x, y)
+print(z)  # 70 
+
+# 对于两个矩阵
+x = np.array([[1,2,3],[3,4,5],[6,7,8]])
+print(x)
+
+y = np.array([[5,4,2],[2,5,6],[8,9,2]])
+print(y)
+# 矩阵乘
+z=np.dot(x,y)
+print(z)
+# 反置矩阵乘
+z=np.dot(y,x)
+print(z)
+
+```
+**在线性代数里面讲的维数和数组的维数不同，如线代中提到的n维行向量（x1,x2,x3,x4...）在 Numpy 中是一维数组，而线性代数中的n维列向量在 Numpy 中是一个shape为(n, 1)的二维数组。**
+
+## 1.2 矩阵特征值与特征向量
+* numpy.linalg.eig(a)计算方阵的特征值和特征向量
+* numpy.linalg.eigvals(a)计算方阵的特征值
+```py
+# 求方阵的特征值与特征向量
+import numpy as np
+# 创建一个对角矩阵
+x = np.diag((1,2,3))
+print(x)
+
+# 计算矩阵的特征值
+a=np.linalg.eigvals(x)
+print(a)
+
+# 放回矩阵的特征值和特征向量
+a,b=np.linalg.eig(x)
+print(a) # 返回特征值
+print(b) # 返回矩阵的特征向量
+
+# 检验特征值与特征向量是否正确
+for i in range(3):
+    # np.allclose()-比较两个array是不是每一元素都相等
+    if np.allclose(a[i]*b[:,i],np.dot(x,b[:,i])):
+        print('right')
+    else:
+        print('false')
+
+            
+```
+
+```py
+# 判断对称矩阵是否为正定阵（即特征值是否全部为正）
+import numpy as np
+A = np.arange(16).reshape(4,4)
+print(A)
+
+A=A+A.T   # 转换成对称阵
+print(A)
+
+B=np.linalg.eigvals(A) # 求A的特征值
+print(B)
+
+# 判断是不是所有的特征值都大于0，用到了all函数
+if np.all(B>0):
+    print('YES')
+else:
+    print('NO')
+
+```
+## 1.3 矩阵分解
+### 1.3.1 奇异值分解
+SVD（Singular Value Decomposition）可以理解为：将一个比较复杂的矩阵用更小更简单的3个子矩阵的相乘来表示，这3个小矩阵描述了大矩阵重要的特性。
+定义：矩阵的奇异值分解是指将一个秩r为的实矩阵分解Amxn为三个实矩阵乘积的形式:
+ 
+* u,s,v=numpy.linalg.svd(a,full_matrices=True,compute_uv=True,hermitian=False)的奇异值分解
+* a 是形如[M,N的矩阵
+* full_matrices的取值是为False或者Ture，默认值为Ture，这时u的大小为(M,M)，v的大小为(N,N)。为False时候：u的大小为(M,K)，v的大小为(K,N) ，K=min(M,N) ；u大小为(M,M)，s大小为(M,N)，v大小为(N,N)，a = u*s*v。
+* compute_uv的取值是为False或者True，默认值为True，表示计算u,s,v。为False的时候只计算s
+* 其中s是对矩阵a的奇异值分解。s除了对角元素不为0，其他元素都为0，并且对角元素从大到小排列。s中有n个奇异值，一般排在后面的比较接近0，所以仅保留比较大的r个奇异值。
+**注：Numpy中返回的v是通常所谓奇异值分解a=u*s*v'中v的转置**
+
+```py
+import numpy as np
+A=np.array([[4,11,14],[8,7,-2]])
+print(A)
+
+u,s,vh=np.linalg.svd(A,full_matrices=False)
+print(u.shape) # （2,2）
+print(u)
+
+print(s.shape)
+print(s)
+print(np.diag(s))
+
+print(vh.shape)
+print(vh)
+
+# 矩阵两两相乘，要把s转换成对角矩阵，只是为了参与矩阵运算吗？
+a=np.dot(u,np.diag(s))
+a=np.dot(a,vh)
+print(a)
+
+```
+### 1.3.2 QR分解
+*q,r=numpy.linalg.qr(a,mode='reduced')计算矩阵a的QR分解
+	* a是一个（M，N）的待分解矩阵
+	* mode = reduced:返回（M,N）的列向量两两正交的矩阵q,和（N,N）的三角阵r
+	* mode=complete: 返回（M,N）的正交矩阵q和（M,N）的三角阵r
+
+```py
+import numpy as np
+A=np.array([[2,-2,3],[1,1,1],[1,3,-1]])
+print(A)
+
+q,r =np.linalg.qr(A)
+# 返回返回（M,N）的列向量两两正交的矩阵q
+print(q.shape) # （3,3）
+print(q)
+
+# 返回和（N,N）的三角阵r
+print(r.shape)
+print(r)
+
+# 返回（M,N）的正交矩阵q和（M,N）的三角阵r
+print(np.dot(q,r))
+
+a=np.allclose(np.dot(q.T,q),np.eye(3))
+print(a)  # True
+```
+
+```py
+
+# 【例2】
+import numpy as np
+A=np.array([[1,1],[1,-2],[2,1]])
+print(A)
+
+q,r=np.linalg.qr(A,mode='complete')
+print(q.shape)
+print(q)
+
+print(r.shape)
+print(r)
+
+print(np.dot(q,r))
+```
+
+```py
+# 【例3】
+import numpy as np
+A=np.array([[1,1],[1,-2],[2,1]])
+print(A)
+
+q,r=np.linalg.qr(A)
+
+print(q.shape)
+print(q)
+
+print(r.shape)
+print(r)
+
+print(np.dot(q,r))
+
+a=np.allclose(np.dot(q.T,q),np.eye(2))
+print(a) # 是说明q为正交矩阵
+```
+### 1.3.3 Cholesky分解
+* L = numpy.linalg.cholesky(a) 返回正定矩阵a的 Cholesky 分解a = L*L.T，其中L是下三角。
+
+```py
+# 【例1】
+import numpy as np
+A=np.array([[1,1,1,1],[1,3,3,3],[1,3,5,5],[1,3,5,7]])
+print(A)
+
+print(np.linalg.eigvals(A)) #求矩阵特征值
+L=np.linalg.cholesky(A)
+print(L)
+
+print(np.dot(L,L.T))
+
+```
+## 1.4 范数和其他数字
+### 1.4.1 矩阵的范数
+* numpy.linalg.norm(x,ord=None,axis=None,keepdims=False)计算向量或者矩阵的范数
+	* 根据ord参数的不同，计算不同的范数：
+ 
+```py
+# 求向量的范数
+import numpy as np
+x = np.array([1, 2, 3, 4])
+
+print(np.linalg.norm(x, ord=1)) 
+# 10.0
+print(np.sum(np.abs(x)))  
+# 10
+
+print(np.linalg.norm(x, ord=2))  
+# 5.477225575051661
+print(np.sum(np.abs(x) ** 2) ** 0.5)  
+# 5.477225575051661
+
+print(np.linalg.norm(x, ord=-np.inf))  
+# 1.0
+print(np.min(np.abs(x)))  
+# 1
+
+print(np.linalg.norm(x, ord=np.inf))  
+# 4.0
+print(np.max(np.abs(x)))  .
+```
+
+## 1.5 方阵的行列式
+* numpy.linalg.dot(a) 计算行列式
+```py
+# 计算行列式
+import numpy as np
+x=np.array([[1,2],[3,4]])
+print(x)
+
+a=np.linalg.det(x)
+print(a)
+```
+### 1.5.1 矩阵的秩
+* numpy.linalg.matrix_rank(M, tol=None, hermitian=False) 返回矩阵的秩。
+```
+## 矩阵的秩
+import numpy as np
+I=np.eye(3) #创造单位矩阵
+print(I)
+
+r= np.linalg.matrix_rank(I)
+print(r)
+
+I[1,1]=0
+print(I)
+
+r=np.linalg.matrix_rank(I) # 此时矩阵秩变为2
+print(r)
+```
+### 1.5.2 矩阵的迹
+* numpy.trace(a, offset=0, axis1=0, axis2=1, dtype=None, out=None) 方阵的迹就是主对角元素之和。
+```py
+## 矩阵的迹
+import numpy as np
+x=np.array([[1,2,3],[3,4,5],[6,7,8]])
+print(x)
+
+y=np.array([[5,4,2],[1,7,9],[0,4,5]])
+print(y)
+
+print(np.trace(x)) #A的迹等于A.T的迹
+print(np.trace(np.transpose(x)))
+
+print(np.trace(x+y))
+print(np.trace(x)+np.trace(y))
+```
+## 1.6 解方程和逆矩阵
+### 1.6.1 逆矩阵（Inverse matrix）
+设A是数域上的一个n阶矩阵，若在相同数域上存在另一个n阶矩阵B，使得：AB=BA=E(单位矩阵)，则我们称B是A的矩阵，而A则被称为可逆矩阵。
+* Numpy.linalg.inv(a)计算矩阵a的逆矩阵（矩阵可逆的充要条件：det(a)!=0,或者a满秩）
+```py
+import numpy as np
+A=np.array([[1,-2,1],[0,2,-1],[1,1,-2]])
+print(A)
+
+# 求A的行列式，不为零则存在逆矩阵
+A_det=np.linalg.det(A)
+print(A_det)
+
+A_inverse=np.linalg.inv(A)
+print(A_inverse)
+
+x=np.allclose(np.dot(A,A_inverse),np.eye(3))
+print(x) # True
+x=np.allclose(np.dot(A_inverse,A),np.eye(3))
+print(x) #True
+
+# 求A的伴随矩阵
+A_companin=A_inverse * A_det
+print(A_companin)
+```
+### 1.6.2 求解线性方程组
+* numpy.linalg.solve(a,b)求解线性方程组或矩阵方程
+```py
+# 求解线性矩阵方程
+import numpy as np
+A= np.array([[1,2,1],[2,-1,3],[3,1,2]])
+b= np.array([7,7,18])
+x=np.linalg.solve(A,b)
+
+x=np.linalg.inv(A).dot(b)
+print(x)
+
+# 验证判断
+y=np.allclose(np.dot(A,x),b)
+print(y)
+```
+
+# 2 联系题
+**一切的学习不做练习题来校验反馈都是自我安慰**
+
+
+
