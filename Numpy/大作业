@@ -1,0 +1,69 @@
+# 大作业
+## 1 导入植物数据集，保持文本不变
+## 【知识点：输入和输出】
+import numpy as np
+outfile=r'C:\Users\Administrator\Desktop\iris.data' # 文件的位置
+# np.loadtxt的用法
+iris_data=np.loadtxt(outfile,dtype=object,delimiter=',',skiprows=1)
+print(iris_data[0:10])
+
+## 2 求出植物长度的平均值，中位数和标准差(第一列数据)
+# 【统计相关】
+
+import numpy as np
+outfile=r'C:\Users\Administrator\Desktop\iris.data' # 文件的位置
+# np.loadtxt的用法
+sepalLength=np.loadtxt(outfile,dtype=float,delimiter=',',skiprows=1,usecols=[0])
+print(sepalLength[0:10])
+
+## 3 标准化数组
+import numpy as np
+outfile=r'C:\Users\Administrator\Desktop\iris.data' # 文件的位置
+# np.loadtxt的用法
+sepalLength=np.loadtxt(outfile,dtype=float,delimiter=',',skiprows=1,usecols=[0])
+
+amax=np.max(sepalLength)
+amin=np.min(sepalLength)
+x=(sepalLength-amin)/(amax-amin)
+print(x[0:10])
+
+## 4 找到植物片长度的第5和第95位百分数
+# 【统计相关】
+x=np.percentile(sepalLength,[5,95])
+print(x)
+
+## 6 在data的sepallength中查找缺失值的个位数和位置
+import numpy as np
+outfile=r'C:\Users\Administrator\Desktop\iris.data'
+iris_data=np.loadtxt(outfile,dtype=float,delimiter=',',skiprows=1,usecols=[0,1,2,3])
+i,j=iris_data.shape
+np.random.seed(20200621)
+iris_data[np.random.randint(i,size=20),np.random.randint(j,size=20)]=np.nan
+sepalLength=iris_data[:,0]
+x=np.isnan(sepalLength)
+print(sum(x))
+print(np.where(x))
+
+## 7 筛选具有第一列<5.0并且第三列>1.5的iris_data运行。
+## 【知识点】搜索  如何根据两个或多个条件筛选numpy数组
+import numpy as np
+outfile=r'C:\Users\Administrator\Desktop\iris.data'
+iris_data=np.loadtxt(outfile,dtype=float,delimiter='',skiprows=1,usecols=[0,1,2,3])
+sepalLength=iris_data[:,0]
+petallength=iris_data[:,2]
+index=np.where(np.logical_and(petallength>1.5,sepalLength<5.0))
+
+print(iris_data[index])
+
+## 8 选择没有任何nan值的iris_data运行
+## 【知识点：逻辑函数，搜索】 如何从numpy数组中删除包含缺失值的行
+
+import numpy as np
+outfile = r'C:\Users\Administrator\Desktop\iris.data'
+iris_data=np.loadtxt(outfile,dtype=float,delimiter=',',skiprows=1,usecols=[0,1,2,3])
+i,j = iris_data.shape
+np.random.seed(20200621)
+iris_data[np.random.randint(i,size=20),np.random.randint(j,size=20)]=np.nan
+x=iris_data[np.sum(np.isnan(iris_data),axis=1)==0]
+print(x[0:10])
+
